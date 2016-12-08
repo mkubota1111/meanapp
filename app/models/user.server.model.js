@@ -6,14 +6,24 @@ const UserSchema = new Schema({
   lastName: String,
   email: {
     type: String,
-    index: true
+    index: true,
+    match: /.+\@.+\..+/
   },
   username: {
     type: String,
     trim: true,
-    unique: true
+    unique: true,
+    required: true
   },
-  password: String,
+  password: {
+    type: String,
+    validate: [
+      function(password) {
+        return password.length >= 6;
+      },
+      'Password should be longer'
+    ]
+  },
   create: {
     type: Date,
     default: Date.now
@@ -31,6 +41,10 @@ const UserSchema = new Schema({
         return url;
       }
     }
+  },
+  role: {
+    type: String,
+    enum: ['Admin', 'Owner', 'User']
   }
 });
 
@@ -43,5 +57,13 @@ UserSchema.virtual('fullName').get(function() {
 });
 
 UserSchema.set('toJSON', {getters: true, virtuals: true});
+
+UserSchema.statics.findOneByUsername = function(username, callback) {
+  this.findOne({username: new RegExp(username, 'i')}, callback);
+}
+
+UserSchema.methods.authenticate = function(password) {
+  return this.password === password;
+}
 
 mongoose.model('User', UserSchema);
