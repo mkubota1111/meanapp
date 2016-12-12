@@ -4,14 +4,27 @@
   "description": "MEAN app tutorial",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "app": "node server",
+    "start": "concurrently \"npm run tsc:w\" \"npm run app\"",
+    "postinstall": "typings install"
   },
   "author": "Marcus V. Kubota",
   "license": "ISC",
   "dependencies": {
+    "@angular/common": "^2.3.0",
+    "@angular/compiler": "^2.3.0",
+    "@angular/core": "^2.3.0",
+    "@angular/forms": "^2.3.0",
+    "@angular/http": "^2.3.0",
+    "@angular/platform-browser": "^2.3.0",
+    "@angular/platform-browser-dynamic": "^2.3.0",
+    "@angular/router": "^3.3.0",
     "body-parser": "^1.15.2",
     "compression": "^1.6.2",
     "connect-flash": "^0.1.1",
+    "core-js": "^2.4.1",
     "ejs": "^2.5.5",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
@@ -20,6 +33,16 @@
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "reflect-metadata": "^0.1.8",
+    "rxjs": "^5.0.0-rc.5",
+    "systemjs": "^0.19.41",
+    "zone.js": "^0.7.2"
+  },
+  "devDependencies": {
+    "concurrently": "^3.1.0",
+    "traceur": "0.0.111",
+    "typescript": "^2.1.4",
+    "typings": "^2.0.0"
   }
 }
