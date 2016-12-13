@@ -1,8 +1,8 @@
-const User = require('mongoose').model('User');
-const passport = require('passport');
+const User = require('mongoose').model('User'),
+      passport = require('passport');
 
-function getErrorMessage(err) {
-  let message = '';
+const getErrorMessage = function (err) {
+  const message = '';
 
   if (err.code) {
     switch (err.code) {
@@ -23,52 +23,51 @@ function getErrorMessage(err) {
   return message;
 }
 
-exports.renderSignin = function(req, res, next) {
-  if (!req.user) {
-    res.render('signin', {
-      title: 'Sign-in Form',
-      messages: req.flash('error') || req.flash('info')
-    })
-  }
-  else {
-    return res.redirect('/');
-  }
-};
+exports.signin = function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err || !user) {
+      res.status(400).send(info);
+    }
+    else {
+      user.password = undefined;
+      user.salt = undefined;
 
-exports.renderSignup = function(req, res, next) {
-  if (!req.user) {
-    res.render('signup', {
-      title: 'Sign-up Form',
-      messages: req.flash('error')
-    });
-  }
-  else {
-    return res.redirect('/');
-  }
+      req.login(user, function(err) {
+        if (err) {
+          res.status(400).send(err);
+        }
+        else {
+          res.json(user);
+        }
+      });
+    }
+  })(req,res, next);
 };
 
 exports.signup = function(req, res, next) {
-  if (!req.user) {
-    const user = new User(req.body);
-    user.provider = 'local';
+  const user = new User(req.body);
+  user.provider = 'local';
 
-    user.save((err) => {
-      if (err) {
-        const message = getErrorMessage(err);
-
-        req.flash('error', message);
-        return res.redirect('/signup');
-      }
-
-      req.login(user, (err) => {
-        if (err) return next(err);
-        return res.redirect('/');
+  user.save((err) => {
+    if (err) {
+      return res.status(400).send({
+        message: getErrorMessage(err)
       });
-    });
-  }
-  else {
-    return res.redirect('/');
-  }
+    }
+    else {
+      user.password = undefined;
+      user.salt = undefined;
+
+      req.login(user, function(err) {
+        if (err) {
+          res.status(400).send(err);
+        }
+        else {
+          res.json(user);
+        }
+      });
+    }
+  });
 };
 
 exports.signout = function(req, res) {

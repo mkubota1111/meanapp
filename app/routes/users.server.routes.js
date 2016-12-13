@@ -2,26 +2,16 @@ const users = require('../../app/controllers/users.server.controller');
 const passport = require('passport');
 
 module.exports = function(app) {
-  app.route('/signup')
-    .get(users.renderSignup)
-    .post(users.signup);
+  app.route('/api/auth/signup').post(users.signup);
+  app.route('/api/auth/signin').post(users.signin);
+  app.route('/api/auth/signout').get(users.signout);
 
-  app.route('/signin')
-    .get(users.renderSignin)
-    .post(passport.authenticate('local', {
-      successRedirect: '/',
-      failureRedirect: '/signin',
-      failureFlash: true
-    }));
-
-  app.get('/signout', users.signout);
-
-  app.get('/oauth/facebook', passport.authenticate('facebook', {
+  app.get('/api/oath/facebook', passport.authenticate('facebook', {
     scope: ['email'],
-    failureRedirect: '/signin'
+    failureRedirect: '/signin',
+    successRedirect: '/'
   }));
-
-  app.get('/oauth/facebook/callback', passport.authenticate('facebook', {
+  app.get('/api/oauth/facebook/callback', passport.authenticate('facebook', {
     scope: ['email'],
     failureRedirect: '/signin',
     successRedirect: '/'
